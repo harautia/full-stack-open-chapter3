@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-let persons = [
+const persons = [
   { 
     "id": "1",
     "name": "Arto Hellas", 
@@ -24,10 +24,33 @@ let persons = [
   }
 ]
 
+// Define info and time variables
+
+let now = new Date();
+let basic_info = '';
+
+// Update the now information for the basic_info to be displayed
+function updateDateTime() {
+  now = new Date();
+  // Update the basic_info string inside the function
+  basic_info = `Phonebook has info for ${persons.length} people\n\n${now.toDateString()} ${now.toTimeString()}`;
+}
+
+// This is needed to update time for the first time!
+updateDateTime();
+
+// This defines the update interval for time in mseconds
+setInterval(updateDateTime, 1000);
+
 app.use(express.json())
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
+})
+
+app.get('/info', (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/plain' })
+  response.end(basic_info)
 })
 
 const PORT = 3001
