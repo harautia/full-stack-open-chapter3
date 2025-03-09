@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-const persons = [
+let persons = [
   { 
     "id": "1",
     "name": "Arto Hellas", 
@@ -32,7 +32,6 @@ let basic_info = '';
 // Update the now information for the basic_info to be displayed
 function updateDateTime() {
   now = new Date();
-  // Update the basic_info string inside the function
   basic_info = `Phonebook has info for ${persons.length} people\n\n${now.toDateString()} ${now.toTimeString()}`;
 }
 
@@ -51,6 +50,19 @@ app.get('/api/persons', (request, response) => {
 app.get('/info', (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/plain' })
   response.end(basic_info)
+})
+
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  console.log(id)
+  const person = persons.find(person => person.id == id)  // This had to changed from "===" to "=="
+  console.log(person)
+  if (person) {
+    response.json(person)
+  } else {
+    console.log('Person Not Found!')
+    response.status(404).end()
+  }
 })
 
 const PORT = 3001
