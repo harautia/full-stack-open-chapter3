@@ -82,13 +82,26 @@ app.post('/api/persons', (request, response) => {
   console.log(body.name)
   if (!body.name) {
     return response.status(400).json({ 
-      error: 'content missing' 
+      error: 'Name Missing' 
     })
   }
+  if (!body.number) {
+    return response.status(400).json({ 
+      error: 'Number Missing' 
+    })
+  }
+
   const person = {
     id: String(generateId()),
     name: body.name,
     number: body.number,
+  }
+  // This checks wheter any element in the array matches
+  // to new name. IF YES --> Send error
+  if (persons.some(person => person.name === body.name)) {
+    return response.status(400).json({ 
+      error: 'Name exists' 
+    })
   }
   persons = persons.concat(person)
   response.json(person)
