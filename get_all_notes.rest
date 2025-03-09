@@ -4,9 +4,9 @@ GET http://localhost:3001/api/persons
 DELETE http://localhost:3001/api/persons/4
 
 ###
-POST http://localhost:3001/api/notes
+POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-"content": "Adding again new element to database - Next", "important": true
+"name": "Mikko Mallikas", "number": "+3581234567"
 }
