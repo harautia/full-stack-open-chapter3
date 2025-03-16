@@ -1,5 +1,27 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
+
+// It creates a custom token for request body
+morgan.token('request-body', (request) => {
+  return JSON.stringify(request.body);
+});
+
+// This is used in because POST URL format
+app.use(express.urlencoded({ extended: true }));
+
+// This is is used for example to show GET request data in JSON format?
+app.use(express.json())
+
+// This defines the morgan output log based on HTTP Request. POST --> use defined parameters
+// ALL Other Requests --> Use TINY
+app.use((req, res, next) => {
+  if (req.method === 'POST') {
+    return morgan(':method :url :status :res[content-length] :response-time ms - :req[content-type] - body: :request-body')(req, res, next);
+  } else {
+    return morgan('tiny')(req, res, next);
+  }
+});
 
 let persons = [
   { 
@@ -46,8 +68,6 @@ updateDateTime();
 
 // This defines the update interval for time in mseconds
 setInterval(updateDateTime, 1000);
-
-app.use(express.json())
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -104,6 +124,7 @@ app.post('/api/persons', (request, response) => {
     })
   }
   persons = persons.concat(person)
+  response.send('User Created')
 })
 
 const PORT = 3001
