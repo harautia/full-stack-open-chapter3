@@ -1,12 +1,12 @@
-GET http://localhost:3001/api/persons
+GET https://phonebook-backend-misty-shape-1020.fly.dev/api/persons
 
 ###
-DELETE http://localhost:3001/api/persons/5
+DELETE https://phonebook-backend-misty-shape-1020.fly.dev/api/persons/5
 
 ###
-POST http://localhost:3001/api/persons
+POST https://phonebook-backend-misty-shape-1020.fly.dev/api/persons
 Content-Type: application/json
 
 {
-"name": "Mikko Mallikas", "number": "+35812345678"
+"id": 5, "name": "Hannu Rautiainen", "number": "+35812345678"
 }

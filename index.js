@@ -2,6 +2,10 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
+const cors = require('cors')
+
+app.use(cors())
+
 // It creates a custom token for request body
 morgan.token('request-body', (request) => {
   return JSON.stringify(request.body);
