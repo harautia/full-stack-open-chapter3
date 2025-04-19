@@ -89,16 +89,41 @@ app.post('/api/persons', (request, response) => {
   persons = persons.concat(person)
   response.send('User Created')
 })
+
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  console.log(id)
+  const person = Person.find(person => person.id == id)  // This had to changed from "===" to "=="
+  console.log(person)
+  if (person) {
+    response.json(person)
+  } else {
+    console.log('Person Not Found!')
+    response.status(404).end()
+  }
+  response.status(500).end()
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  persons = persons.filter(person => person.id != id) // This had to changed from "!==" to "!="
+  response.status(204).end()
+})
+
 */
 
-// New way exercise 3.13 change
+// Exercise 3.13 change
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
-    response.json(persons)
+    if (persons) {
+      response.json(persons)
+    } else {
+      response.status(404).end()
+    }
   })
 })
 
-// New way exercise 3.14 change
+// Exercise 3.14 change
 app.post('/api/persons', (request, response) => {
   const body = request.body
   console.log(body.name)
@@ -118,25 +143,34 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  console.log(id)
-  const person = persons.find(person => person.id == id)  // This had to changed from "===" to "=="
-  console.log(person)
-  if (person) {
-    response.json(person)
-  } else {
-    console.log('Person Not Found!')
-    response.status(404).end()
-  }
+  Person.findById(request.params.id)
+  .then(person => {
+    if (person) {
+      console.log(request.params.id)
+      response.json(person)
+    } else {
+      console.log(request.params.id)
+      response.status(404).end()
+    }
+  })
+  .catch(error => {
+    console.log(error)
+    response.status(400).send({ error: 'malformatted id' })
+  })
 })
 
+// Exercise 3.15 change 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id != id) // This had to changed from "!==" to "!="
-  response.status(204).end()
+  Person.findByIdAndDelete(request.params.id)
+  .then(result => {
+    console.log('User Deleted')
+    response.status(204).end()
+  })
+  .catch(error => {
+    console.log(error)
+    response.status(400).send({ error: 'malformatted id' })
+  })
 })
-
-
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
