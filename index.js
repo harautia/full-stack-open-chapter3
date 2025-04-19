@@ -58,36 +58,6 @@ setInterval(updateDateTime, 1000);
 
 /*app.get('/api/persons', (request, response) => {
   response.json(persons)
-})*/
-
-app.get('/api/persons', (request, response) => {
-  Person.find({}).then(persons => {
-    response.json(persons)
-  })
-})
-
-app.get('/info', (request, response) => {
-  response.writeHead(200, { 'Content-Type': 'text/plain' })
-  response.end(basic_info)
-})
-
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  console.log(id)
-  const person = persons.find(person => person.id == id)  // This had to changed from "===" to "=="
-  console.log(person)
-  if (person) {
-    response.json(person)
-  } else {
-    console.log('Person Not Found!')
-    response.status(404).end()
-  }
-})
-
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id != id) // This had to changed from "!==" to "!="
-  response.status(204).end()
 })
 
 app.post('/api/persons', (request, response) => {
@@ -119,6 +89,54 @@ app.post('/api/persons', (request, response) => {
   persons = persons.concat(person)
   response.send('User Created')
 })
+*/
+
+// New way exercise 3.13 change
+app.get('/api/persons', (request, response) => {
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
+})
+
+// New way exercise 3.14 change
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+  console.log(body.name)
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
+})
+
+app.get('/info', (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/plain' })
+  response.end(basic_info)
+})
+
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  console.log(id)
+  const person = persons.find(person => person.id == id)  // This had to changed from "===" to "=="
+  console.log(person)
+  if (person) {
+    response.json(person)
+  } else {
+    console.log('Person Not Found!')
+    response.status(404).end()
+  }
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  persons = persons.filter(person => person.id != id) // This had to changed from "!==" to "!="
+  response.status(204).end()
+})
+
+
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
