@@ -9,7 +9,6 @@ const cors = require('cors')
 app.use(cors())
 
 const Person = require('./models/person')
-
 let persons = [ ]
 
 // It creates a custom token for request body
@@ -32,13 +31,6 @@ app.use((req, res, next) => {
     return morgan('tiny')(req, res, next);
   }
 });
-
-const generateId = () => {
-  const maxId = persons.length > 0
-    ? Math.max(...persons.map(n => n.id))
-    : 0
-  return maxId + 1
-}
 
 // Define info and time variables
 let now = new Date();
@@ -109,11 +101,9 @@ app.delete('/api/persons/:id', (request, response) => {
   persons = persons.filter(person => person.id != id) // This had to changed from "!==" to "!="
   response.status(204).end()
 })
-
 */
 
-// Exercise 3.13 change
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response,next) => {
   Person.find({}).then(persons => {
     if (persons) {
       response.json(persons)
@@ -121,20 +111,46 @@ app.get('/api/persons', (request, response) => {
       response.status(404).end()
     }
   })
+  .catch(error => next(error))
 })
 
-// Exercise 3.14 change
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
   console.log(body.name)
   const person = new Person({
     name: body.name,
     number: body.number,
   })
-
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
+  .catch(error => next(error))
+})
+
+app.post('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body
+
+  Person.findById(request.params.id)
+    .then(person => {
+      if (!person) {
+        return response.status(404).end()
+      }
+      person.name = name
+      person.number = number
+      return person.save().then(savedPerson => {
+        response.json(savedPerson)
+      })
+    })
+    .catch(error => next(error))
+})
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+  .then(result => {
+    console.log('User Deleted')
+    response.status(204).end()
+  })
+  .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
@@ -142,7 +158,7 @@ app.get('/info', (request, response) => {
   response.end(basic_info)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
   .then(person => {
     if (person) {
@@ -153,24 +169,23 @@ app.get('/api/persons/:id', (request, response) => {
       response.status(404).end()
     }
   })
-  .catch(error => {
-    console.log(error)
-    response.status(400).send({ error: 'malformatted id' })
-  })
+  .catch(error => next(error))
 })
 
-// Exercise 3.15 change 
-app.delete('/api/persons/:id', (request, response) => {
-  Person.findByIdAndDelete(request.params.id)
-  .then(result => {
-    console.log('User Deleted')
-    response.status(204).end()
-  })
-  .catch(error => {
-    console.log(error)
-    response.status(400).send({ error: 'malformatted id' })
-  })
-})
+const errorHandler = (error, request, response, next) => {
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+  next(error)
+}
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
+app.use(unknownEndpoint)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
