@@ -9,7 +9,21 @@ const cors = require('cors')
 app.use(cors())
 
 const Person = require('./models/person')
-let persons = [ ]
+//let persons = [ ]
+
+// Define info and time variables
+let now = new Date();
+
+// Update the now information for the basic_info to be displayed
+function updateDateTime() {
+  now = new Date();
+
+  // This is needed to update time for the first time!
+  updateDateTime();
+
+  // This defines the update interval for time in mseconds
+  setInterval(updateDateTime, 1000);
+}
 
 // It creates a custom token for request body
 morgan.token('request-body', (request) => {
@@ -31,22 +45,6 @@ app.use((req, res, next) => {
     return morgan('tiny')(req, res, next);
   }
 });
-
-// Define info and time variables
-let now = new Date();
-let basic_info = '';
-
-// Update the now information for the basic_info to be displayed
-function updateDateTime() {
-  now = new Date();
-  basic_info = `Phonebook has info for ${persons.length} people\n\n${now.toDateString()} ${now.toTimeString()}`;
-}
-
-// This is needed to update time for the first time!
-updateDateTime();
-
-// This defines the update interval for time in mseconds
-setInterval(updateDateTime, 1000);
 
 /*app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -129,7 +127,6 @@ app.post('/api/persons', (request, response, next) => {
 
 app.post('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
-
   Person.findById(request.params.id)
     .then(person => {
       if (!person) {
@@ -154,8 +151,11 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/info', (request, response) => {
-  response.writeHead(200, { 'Content-Type': 'text/plain' })
-  response.end(basic_info)
+  Person.find({}).then(persons => {
+    const basic_info = `Phonebook has info for ${persons.length} people\n\n${now.toDateString()} ${now.toTimeString()}`;
+    response.set('Content-Type', 'text/plain');
+    response.send(basic_info);
+  })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {

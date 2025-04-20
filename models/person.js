@@ -1,5 +1,3 @@
-const name = process.argv[3]
-const number = process.argv[4]
 const mongoose = require('mongoose')
 
 mongoose.set('strictQuery', false)
@@ -22,11 +20,6 @@ mongoose.connect(url)
   })
 
   const Person = mongoose.model('Person', personSchema)
-    
-  const person = new Person({
-    name: name,
-    number: number,
-  })
   
   personSchema.set('toJSON', {
     transform: (document, returnedObject) => {
