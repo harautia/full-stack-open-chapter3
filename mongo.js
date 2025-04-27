@@ -21,7 +21,10 @@ const personSchema = new mongoose.Schema({
   number: String
 })
 
+
 const Person = mongoose.model('Person', personSchema)
+
+
 
 const person = new Person({
   name: name,
