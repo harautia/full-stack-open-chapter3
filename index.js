@@ -12,26 +12,23 @@ const Person = require('./models/person')
 //let persons = [ ]
 
 // Define info and time variables
-let now = new Date();
-
+let now = new Date()
 // Update the now information for the basic_info to be displayed
 function updateDateTime() {
-  now = new Date();
-
+  now = new Date()
   // This is needed to update time for the first time!
-  updateDateTime();
-
+  updateDateTime()
   // This defines the update interval for time in mseconds
-  setInterval(updateDateTime, 1000);
+  setInterval(updateDateTime, 1000)
 }
 
 // It creates a custom token for request body
 morgan.token('request-body', (request) => {
-  return JSON.stringify(request.body);
-});
+  return JSON.stringify(request.body)
+})
 
 // This is used in because POST URL format
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }))
 
 // This is is used for example to show GET request data in JSON format?
 app.use(express.json())
@@ -40,11 +37,11 @@ app.use(express.json())
 // ALL Other Requests --> Use TINY
 app.use((req, res, next) => {
   if (req.method === 'POST') {
-    return morgan(':method :url :status :res[content-length] :response-time ms - :req[content-type] - body: :request-body')(req, res, next);
+    return morgan(':method :url :status :res[content-length] :response-time ms - :req[content-type] - body: :request-body')(req, res, next)
   } else {
-    return morgan('tiny')(req, res, next);
+    return morgan('tiny')(req, res, next)
   }
-});
+})
 
 /*app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -109,7 +106,7 @@ app.get('/api/persons', (request, response,next) => {
       response.status(404).end()
     }
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 //error = savedPerson.validateSync();
@@ -125,7 +122,7 @@ app.post('/api/persons', (request, response, next) => {
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.post('/api/persons/:id', (request, response, next) => {
@@ -146,42 +143,42 @@ app.post('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-  .then(result => {
-    console.log('User Deleted')
-    response.status(204).end()
-  })
-  .catch(error => next(error))
+    .then(result => {
+      console.log(result, 'User Deleted')
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
   Person.find({}).then(persons => {
-    const basic_info = `Phonebook has info for ${persons.length} people\n\n${now.toDateString()} ${now.toTimeString()}`;
-    response.set('Content-Type', 'text/plain');
-    response.send(basic_info);
+    const basic_info = `Phonebook has info for ${persons.length} people\n\n${now.toDateString()} ${now.toTimeString()}`
+    response.set('Content-Type', 'text/plain')
+    response.send(basic_info)
   })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
-  .then(person => {
-    if (person) {
-      console.log(request.params.id)
-      response.json(person)
-    } else {
-      console.log(request.params.id)
-      response.status(404).end()
-    }
-  })
-  .catch(error => next(error))
+    .then(person => {
+      if (person) {
+        console.log(request.params.id)
+        response.json(person)
+      } else {
+        console.log(request.params.id)
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 const errorHandler = (error, request, response, next) => {
-if (error.name === 'CastError') {
-  return response.status(400).send({ error: 'malformatted id' })
-}
-else if (error.name === 'ValidationError') {
-  return response.status(400).json({ error: error.message })
-}}
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }}
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })

@@ -8,7 +8,7 @@ console.log('connecting to', url)
 mongoose.connect(url)
 
   .then(result => {
-    console.log('connected to MongoDB')
+    console.log(result,'connected to MongoDB')
   })
   .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
@@ -20,18 +20,18 @@ const personSchema = new mongoose.Schema({
     minLength: 3,
     required: true
   },
-    number: {
+  number: {
     type: String,
     validate: {
       validator: function(validate) {
         // Tarkistetaan että ensin tulee 2 tai 3 numeroa, sitten - jonka jälkeen numeroita
         if (!/^\d{2,3}-\d+$/.test(validate)) {
-          return false;
+          return false
         }
         // Tässä otetaan stringistä kaikki muut kuin digitit pois 
-        const digitsOnly = validate.replace(/\D/g, '');
+        const digitsOnly = validate.replace(/\D/g, '')
         // return = FALSE jos ehto ei täyty
-        return digitsOnly.length >= 8;
+        return digitsOnly.length >= 8
       },
       message: props => `${props.value} is not a valid phone number! Must start with 2-3 digits, include a hyphen, and have at least 8 digits total.`
     },
